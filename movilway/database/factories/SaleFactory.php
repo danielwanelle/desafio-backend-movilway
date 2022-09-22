@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Pdv;
+use App\Models\Sale;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,33 @@ class SaleFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'pdv_id' => Pdv::factory(),
+            'products' => ProductFactory::new()->count(3),
+            'value' => $this->faker->randomFloat(2, 1000, 10000),
+            'cancel_reason' => $this->faker->words(3, true),
+            'status' => $this->faker->randomElement(
+                [
+                    Sale::STATUS_PAYMENT_PENDING,
+                    Sale::STATUS_PAID,
+                    Sale::STATUS_REJECTED,
+                    Sale::STATUS_CANCELED,
+                ]
+            ),
         ];
+    }
+
+    /**
+     * Indicate that the model is active.
+     *
+     * @return static
+     */
+    public function pending()
+    {
+        return $this->state(
+            fn () => [
+                'cancel_reason' => null,
+                'status' => Sale::STATUS_PAYMENT_PENDING,
+            ]
+        );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -114,6 +115,29 @@ class Pdv extends Model
     }
 
     /**
+     * Quit Pdv debt.
+     *
+     * @param float $value
+     * @return boolean
+     */
+    public function paySalesLimit(float $value) : bool
+    {
+        $pending = $this->getTotalPendingSales();
+
+        if ($pending === 0) {
+            return false;
+        }
+
+        if ($pending !== $value) {
+            return false;
+        }
+
+        return $this->sales()
+            ->pending()
+            ->update(['status' => Sale::STATUS_PAID]);
+    }
+
+    /**
      * Deactivate the Pdv.
      *
      * @return bool
@@ -122,5 +146,39 @@ class Pdv extends Model
     {
         $this->active = self::STATUS_INACTIVE;
         return $this->save();
+    }
+
+    /**
+     * Check if Pdv is active.
+     *
+     * @return boolean
+     */
+    public function isActive() : bool
+    {
+        return $this->active === self::STATUS_ACTIVE;
+    }
+
+    /**
+     * Check if sale belongs to Pdv.
+     *
+     * @param Sale $sale Sale
+     *
+     * @return boolean
+     */
+    public function hasSale(Sale $sale) : bool
+    {
+        return $this->sales()->where('id', $sale->id)->exists();
+    }
+
+    /**
+     * Get active Pdvs.
+     *
+     * @param Builder $query Builder
+     *
+     * @return void
+     */
+    public function scopeActive(Builder $query) : void
+    {
+        $query->where('active', self::STATUS_ACTIVE);
     }
 }

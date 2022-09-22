@@ -23,7 +23,7 @@ class PdvController extends Controller
     public function index() : JsonResponse
     {
         try {
-            $pdvs = Pdv::all();
+            $pdvs = Pdv::active()->all();
 
             return $this->successResponse(data: $pdvs);
         } catch (\Exception $e) {
@@ -83,6 +83,10 @@ class PdvController extends Controller
     public function setLimit(Request $request, Pdv $pdv) : JsonResponse
     {
         try {
+            if (!$pdv->isActive()) {
+                throw new \Exception('Pdv not found', 404);
+            }
+
             $validator = Validator::make(
                 $request->all(),
                 [
@@ -108,6 +112,45 @@ class PdvController extends Controller
     }
 
     /**
+     * Pay a Pdv debt.
+     *
+     * @param Request $request Request
+     * @param Pdv     $pdv     Pdv
+     *
+     * @return JsonResponse
+     */
+    public function payLimit(Request $request, Pdv $pdv) : JsonResponse
+    {
+        try {
+            if (!$pdv->isActive()) {
+                throw new \Exception('Pdv not found', 404);
+            }
+
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'payment_value' => ['required', 'numeric', 'min:0.01'],
+                ]
+            );
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $paid = $pdv
+                ->paySalesLimit($validator->validated()['payment_value']);
+
+            if (!$paid) {
+                throw new \Exception('Invalid payment value');
+            }
+
+            return $this->successResponse(message: 'Limit paid', data: $pdv);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
+    }
+
+    /**
      * Return the specified resource.
      *
      * @param int $id 
@@ -117,6 +160,10 @@ class PdvController extends Controller
     public function show(Pdv $pdv) : JsonResponse
     {
         try {
+            if (!$pdv->isActive()) {
+                throw new \Exception('Pdv not found', 404);
+            }
+
             return $this->successResponse(data: $pdv);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
@@ -133,6 +180,10 @@ class PdvController extends Controller
     public function update(Request $request, Pdv $pdv)
     {
         try {
+            if (!$pdv->isActive()) {
+                throw new \Exception('Pdv not found', 404);
+            }
+
             $validator = Validator::make(
                 $request->all(),
                 [
@@ -171,6 +222,10 @@ class PdvController extends Controller
     public function destroy(Pdv $pdv)
     {
         try {
+            if (!$pdv->isActive()) {
+                throw new \Exception('Pdv not found', 404);
+            }
+
             $pdv->deactivate();
 
             return $this->successResponse(message: 'Deleted');

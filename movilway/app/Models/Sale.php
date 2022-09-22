@@ -78,6 +78,27 @@ class Sale extends Model
     }
 
     /**
+     * Cancel the sale
+     *
+     * @param string $reason Reason for cancel
+     *
+     * @return bool
+     */
+    public function cancel(string $reason) : bool
+    {
+        if ($this->status !== self::STATUS_PAYMENT_PENDING) {
+            return false;
+        }
+        
+        return $this->update(
+            [
+                'cancel_reason' => $reason,
+                'status' => self::STATUS_CANCELED,
+            ]
+        );
+    }
+
+    /**
      * Get the sales with payment pending status.
      *
      * @param Builder $query Query builder

@@ -175,9 +175,9 @@ class PdvController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return Response
+     * @return JsonResponse
      */
-    public function update(Request $request, Pdv $pdv)
+    public function update(Request $request, Pdv $pdv) : JsonResponse
     {
         try {
             if (!$pdv->isActive()) {
@@ -217,9 +217,9 @@ class PdvController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return Response
+     * @return JsonResponse
      */
-    public function destroy(Pdv $pdv)
+    public function destroy(Pdv $pdv) : JsonResponse
     {
         try {
             if (!$pdv->isActive()) {

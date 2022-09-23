@@ -19,7 +19,7 @@ class ProductController extends Controller
 
             return $this->successResponse(data: $products);
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return $this->failureResponse($e->getMessage());
         }
     }
 }

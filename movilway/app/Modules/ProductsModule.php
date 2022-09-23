@@ -2,6 +2,7 @@
 
 namespace App\Modules;
 
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
@@ -41,7 +42,7 @@ class ProductsModule
 
             return self::_parseProducts($productsRequest);
         } catch (\Exception $e) {
-            throw new \Exception('Failed to get products');
+            throw new \Exception($e->getMessage() . ' - ' . $e->getTraceAsString());
         }
     }
 
@@ -109,8 +110,8 @@ class ProductsModule
         foreach ($productsRequest->json() as $product) {
             $products[] = [
                 'id' => $product['id'],
-                'name' => $product['nome'],
-                'price' => $product['preco'],
+                'value' => $product['valor'],
+                'description' => $product['descricao'],
             ];
         }
 
@@ -129,7 +130,7 @@ class ProductsModule
         $total = 0;
 
         foreach ($products as $product) {
-            $total += $product['valor'];
+            $total += $product['value'];
         }
 
         return $total;

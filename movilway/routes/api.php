@@ -23,15 +23,26 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::controller(PdvController::class)->group(
     function () {
-        Route::prefix('pdvs')->group(
+        Route::prefix('pdv')->group(
             function () {
                 Route::get('/', 'index');
                 Route::post('/', 'store');
-                Route::put('/{pdv}/set_limit', 'setLimit');
-                Route::put('/{pdv}/pay_limit', 'payLimit');
-                Route::get('/{pdv}', 'show');
-                Route::patch('/{pdv}', 'update');
-                Route::delete('/{pdv}', 'destroy');
+
+                Route::prefix('{pdv}')->group(
+                    function () {
+                        Route::get('/', 'show');
+                        Route::patch('/', 'update');
+                        Route::put('limit', 'setLimit');
+                        Route::delete('/', 'destroy');
+                        
+                        Route::prefix('debt')->group(
+                            function () {
+                                Route::get('/', 'getDebt');
+                                Route::put('quit', 'quitDebt');
+                            }
+                        );
+                    }
+                );
             }
         );
     }
@@ -39,7 +50,7 @@ Route::controller(PdvController::class)->group(
 
 Route::controller(SaleController::class)->group(
     function () {
-        Route::prefix('sales')->group(
+        Route::prefix('sale')->group(
             function () {
                 Route::post('/', 'store');
                 Route::delete('/{sale}', 'cancel');
@@ -50,7 +61,7 @@ Route::controller(SaleController::class)->group(
 
 Route::controller(ProductController::class)->group(
     function () {
-        Route::prefix('products')->group(
+        Route::prefix('product')->group(
             function () {
                 Route::get('/', 'index');
             }

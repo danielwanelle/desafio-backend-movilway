@@ -20,7 +20,23 @@ class SaleFactory extends Factory
     {
         return [
             'pdv_id' => Pdv::factory(),
-            'products' => ProductFactory::new()->count(3),
+            'products' => [
+                [
+                    'id' => 1,
+                    'valor' => 1000,
+                    'descricao' => 'Product 1',
+                ],
+                [
+                    'id' => 2,
+                    'valor' => 2000,
+                    'descricao' => 'Product 2',
+                ],
+                [
+                    'id' => 3,
+                    'valor' => 3000,
+                    'descricao' => 'Product 3',
+                ],
+            ],
             'value' => $this->faker->randomFloat(2, 1000, 10000),
             'cancel_reason' => $this->faker->words(3, true),
             'status' => $this->faker->randomElement(

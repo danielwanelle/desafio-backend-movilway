@@ -42,7 +42,7 @@ class SaleController extends Controller
                 'value' => $total,
             ];
 
-            if (!$pdv->canSale()) {
+            if (!$pdv->canSale($total)) {
                 Sale::create($saleData + ['status' => Sale::STATUS_REJECTED]);
 
                 throw new \Exception('Limit exceeded');
@@ -52,7 +52,7 @@ class SaleController extends Controller
 
             return $this->successResponse(status: 201, data: $sale);
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return $this->failureResponse($e->getMessage());
         }
     }
 
@@ -93,7 +93,7 @@ class SaleController extends Controller
 
             return $this->successResponse(data: $sale);
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return $this->failureResponse($e->getMessage());
         }
     }
 }

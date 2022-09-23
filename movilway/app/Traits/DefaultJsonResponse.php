@@ -57,8 +57,7 @@ trait DefaultJsonResponse
      *
      * @return JsonResponse
      */
-    public function failureResponse(string $message, int $status = 400)
-    : JsonResponse
+    public function failureResponse(string $message, int $status = 400) : JsonResponse
     {
         return response()->json(
             [
@@ -79,5 +78,16 @@ trait DefaultJsonResponse
     private function _getStatusGroup(int $status) : string
     {
         return $this->_statusCodes[intdiv($status, 100)];
+    }
+
+    public function teste()
+    {
+        return response()->json(
+            [
+                'message' => 'teste',
+                'status' => 'teste',
+            ],
+            200
+        );
     }
 }

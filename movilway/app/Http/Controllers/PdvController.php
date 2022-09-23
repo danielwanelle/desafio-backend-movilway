@@ -23,11 +23,11 @@ class PdvController extends Controller
     public function index() : JsonResponse
     {
         try {
-            $pdvs = Pdv::active()->all();
+            $pdvs = Pdv::active()->get();
 
             return $this->successResponse(data: $pdvs);
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return $this->failureResponse($e->getMessage());
         }
     }
 
@@ -68,7 +68,7 @@ class PdvController extends Controller
             
             return $this->successResponse(status: 201, data: $pdv);
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return $this->failureResponse($e->getMessage());
         }
     }
 
@@ -107,7 +107,30 @@ class PdvController extends Controller
 
             return $this->successResponse(message: 'Limit updated', data: $pdv);
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return $this->failureResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * Get pdv debt.
+     *
+     * @param Request $request Request
+     * @param Pdv     $pdv     Pdv
+     *
+     * @return JsonResponse
+     */
+    public function getDebt(Pdv $pdv) : JsonResponse
+    {
+        try {
+            if (!$pdv->isActive()) {
+                throw new \Exception('Pdv not found', 404);
+            }
+
+            $debt = $pdv->getTotalPendingSales();
+
+            return $this->successResponse(data: array($debt));
+        } catch (\Exception $e) {
+            return $this->failureResponse($e->getMessage());
         }
     }
 
@@ -119,7 +142,7 @@ class PdvController extends Controller
      *
      * @return JsonResponse
      */
-    public function payLimit(Request $request, Pdv $pdv) : JsonResponse
+    public function quitDebt(Request $request, Pdv $pdv) : JsonResponse
     {
         try {
             if (!$pdv->isActive()) {
@@ -146,7 +169,7 @@ class PdvController extends Controller
 
             return $this->successResponse(message: 'Limit paid', data: $pdv);
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return $this->failureResponse($e->getMessage());
         }
     }
 
@@ -166,7 +189,7 @@ class PdvController extends Controller
 
             return $this->successResponse(data: $pdv);
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return $this->failureResponse($e->getMessage());
         }
     }
 
@@ -209,7 +232,7 @@ class PdvController extends Controller
 
             return $this->successResponse(message: 'Updated', data: $pdv);
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return $this->failureResponse($e->getMessage());
         }
     }
 
@@ -230,7 +253,7 @@ class PdvController extends Controller
 
             return $this->successResponse(message: 'Deleted');
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return $this->failureResponse($e->getMessage());
         }
     }
 }

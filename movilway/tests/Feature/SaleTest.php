@@ -6,6 +6,7 @@ use App\Models\Pdv;
 use App\Models\Sale;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class SaleTest extends TestCase
@@ -21,13 +22,18 @@ class SaleTest extends TestCase
      */
     public function shouldCreateSale() : void
     {
-        $pdv = Pdv::factory()->active()->create();
+        $pdv = Pdv::factory()->active()->create(['sales_limit' => 10000]);
         $sale = Sale::factory()->make();
+        $products = array();
 
-        $products = $sale->products->map(
-            function ($product) {
-                return $product->id;
-            }
+        foreach ($sale->products as $product) {
+            $products[] = $product->id;
+        }
+
+        Http::fake(
+            [
+                'https://api.redeconekta.com.br/*' => Http::response($sale->products)
+            ]
         );
 
         $response = $this->post(
@@ -66,10 +72,11 @@ class SaleTest extends TestCase
      */
     public function shouldCancelSale() : void
     {
-        $sale = Sale::factory()->create();
+        $pdv = Pdv::factory()->active()->create(['sales_limit' => 10000]);
+        $sale = Sale::factory()->pending()->create(['pdv_id' => $pdv->id]);
 
         $response = $this->delete(
-            "api/sale/$sale->id/cancel",
+            "api/sale/$sale->id",
             [
                 'pdv_id' => $sale->pdv_id,
                 'reason' => 'Test reason',

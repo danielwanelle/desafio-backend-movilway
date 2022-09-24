@@ -93,7 +93,7 @@ class SaleController extends Controller
 
             return $this->successResponse(data: $sale);
         } catch (\Exception $e) {
-            return $this->failureResponse($e->getMessage());
+            return $this->failureResponse($e->getMessage() . $e->getTraceAsString());
         }
     }
 }

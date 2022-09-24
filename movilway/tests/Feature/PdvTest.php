@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Pdv;
+use App\Models\Sale;
 use Tests\TestCase;
 
 class PdvTest extends TestCase
@@ -138,10 +139,11 @@ class PdvTest extends TestCase
     public function shouldUpdateAPdv() : void
     {
         $pdv = Pdv::factory()->active()->create();
+        $phone = fake()->numerify('(##) 9####-####');
 
-        $response = $this->put(
+        $response = $this->patch(
             "api/pdv/$pdv->id",
-            ['owner_phone' => fake()->numerify('(##) #####-####')]
+            ['owner_phone' => $phone]
         );
 
         $response->assertStatus(200);
@@ -162,7 +164,7 @@ class PdvTest extends TestCase
                 ]
             ]
         );
-        $this->assertFalse($response->json('data')['active']);
+        $this->assertEquals($phone, $response->json('data')['owner_phone']);
     }
 
     /**
@@ -188,7 +190,7 @@ class PdvTest extends TestCase
                 'data'
             ]
         );
-        $this->assertFalse($response->json('data'));
+        $this->assertFalse(!!$response->json('data'));
     }
 
     /**
@@ -242,7 +244,8 @@ class PdvTest extends TestCase
      */
     public function shouldQuitPdvDebts() : void
     {
-        $pdv = Pdv::factory()->active()->create();
+        $pdv = Pdv::factory()->active()->create(['sales_limit' => 50000]);
+        Sale::factory()->count(3)->pending()->create(['pdv_id' => $pdv->id]);
 
         $response = $this->put(
             "api/pdv/$pdv->id/debt/quit",

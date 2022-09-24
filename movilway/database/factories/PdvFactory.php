@@ -20,7 +20,7 @@ class PdvFactory extends Factory
             'fantasy_name' => fake()->company(),
             'cnpj' => fake()->numerify('##.###.###/####-##'),
             'owner_name' => fake()->name(),
-            'owner_phone' => fake()->numerify('(##) #####-####'),
+            'owner_phone' => fake()->numerify('(##) 9####-####'),
             'sales_limit' => fake()->randomFloat(2, 1000, 10000),
             'active' => fake()->boolean(),
         ];

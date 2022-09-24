@@ -64,7 +64,7 @@ class PdvController extends Controller
                 throw new ValidationException($validator);
             }
 
-            $pdv = Pdv::create($validator->validated());
+            $pdv = Pdv::create($request->all());
             
             return $this->successResponse(status: 201, data: $pdv);
         } catch (\Exception $e) {
@@ -99,7 +99,7 @@ class PdvController extends Controller
             }
 
             $pdv = $pdv
-                ->updateSalesLimit($validator->validated()['sales_limit']);
+                ->updateSalesLimit($request->get('sales_limit'));
 
             if (!$pdv) {
                 throw new \Exception('Invalid sales limit');
@@ -161,7 +161,7 @@ class PdvController extends Controller
             }
 
             $paid = $pdv
-                ->paySalesLimit($validator->validated()['payment_value']);
+                ->paySalesLimit($request->get('payment_value'));
 
             if (!$paid) {
                 throw new \Exception('Invalid payment value');
@@ -228,7 +228,7 @@ class PdvController extends Controller
                 throw new ValidationException($validator);
             }
 
-            $pdv->update($validator->validated());
+            $pdv->update($request->all());
 
             return $this->successResponse(message: 'Updated', data: $pdv);
         } catch (\Exception $e) {
